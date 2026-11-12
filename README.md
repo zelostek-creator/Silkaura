@@ -12,7 +12,36 @@ Local development stack for the Silkaura store, built on Docker.
 
 ## Run it on your computer
 
-### 1. Install Docker
+There are two ways: **XAMPP** (if you already use it) or **Docker**.
+
+### Option A: XAMPP
+
+1. Install [XAMPP](https://www.apachefriends.org/) with PHP 8.1 or newer.
+2. Open the XAMPP Control Panel and click **Start** next to **Apache** and **MySQL**.
+3. Download this repo (`git clone`, or *Code → Download ZIP* on GitHub and unzip it).
+4. Run the installer from the repo folder:
+   - **Windows:** double-click `install-xampp.cmd`
+     (or in PowerShell: `powershell -ExecutionPolicy Bypass -File scripts\xampp-install.ps1`)
+   - **Mac / Linux:** `bash scripts/xampp-install.sh`
+     (on Linux, use `sudo` if your XAMPP lives in `/opt/lampp` and is owned by root)
+5. Open **http://localhost/silkaura**. Admin is at http://localhost/silkaura/wp-admin
+   with user `admin` / password `admin123`. Change the password in *Users → Profile*.
+
+The installer downloads WordPress into `htdocs/silkaura`, creates a `silkaura`
+database, installs WooCommerce and Storefront, and links the Silkaura theme from
+this repo, so edits to the theme files in the repo show up on the site right away.
+It's safe to run again.
+
+Options (Windows: `-AdminPassword secret -Port 8080`; Mac/Linux: `ADMIN_PASSWORD=secret PORT=8080 bash ...`):
+`Site`, `DbName`, `DbUser`, `DbPassword`, `Port`, `AdminUser`, `AdminPassword`, `AdminEmail`, `XamppDir`.
+Set `Port` if Apache isn't on port 80 (common on Windows when Skype or IIS takes it).
+
+To start over, delete `htdocs/silkaura` and drop the `silkaura` database in phpMyAdmin
+(http://localhost/phpmyadmin).
+
+### Option B: Docker
+
+#### 1. Install Docker
 - **Mac / Windows:** install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and open it once
   so it's running (whale icon in the menu bar / system tray).
   On Windows, accept the WSL 2 prompt if Docker Desktop asks for it.
@@ -20,14 +49,14 @@ Local development stack for the Silkaura store, built on Docker.
 
 Check it works: `docker compose version`
 
-### 2. Get the code
+#### 2. Get the code
 ```bash
 git clone https://github.com/zelostek-creator/Silkaura.git
 cd Silkaura
 git checkout claude/serene-sagan-7q8qxp   # until this is merged into main
 ```
 
-### 3. Install the store
+#### 3. Install the store
 **Mac / Linux** (has `make`):
 ```bash
 cp .env.example .env      # then edit .env: set WP_ADMIN_PASSWORD
@@ -47,7 +76,7 @@ http://localhost:8080/wp-admin with the user/password from `.env`.
 
 > Port 8080 already in use? Change `WP_PORT` and `WP_URL` in `.env` before installing.
 
-### Stopping and starting
+#### Stopping and starting
 Your data is kept in Docker volumes between runs.
 - Stop: `make down` (Windows: `docker compose down`)
 - Start again: `make up` (Windows: `docker compose up -d`)
@@ -76,14 +105,19 @@ Without `make`, the equivalent of `make wp ARGS="plugin list"` is
 
 ## Testing orders
 Cash on Delivery is enabled, so you can place an order at checkout without a card.
-Order emails (customer + admin) show up in Mailpit at http://localhost:8025.
+With Docker, order emails (customer + admin) show up in Mailpit at http://localhost:8025.
+XAMPP doesn't send email out of the box; orders still work, the emails just aren't delivered.
 
 ## What's in the repo
 ```
 docker-compose.yml               # db, wordpress, wpcli, phpmyadmin, mailpit
 .env.example                     # configuration (copy to .env)
 config/uploads.ini               # PHP limits (64M uploads, 512M memory)
-scripts/install.sh               # WP-CLI provisioning script
+scripts/provision.php            # Shared setup: WooCommerce, Storefront, theme, store settings
+scripts/setup-store.php          # Store settings, pages and sample products
+scripts/install.sh               # Docker installer
+scripts/xampp-install.ps1        # XAMPP installer (Windows); install-xampp.cmd runs it
+scripts/xampp-install.sh         # XAMPP installer (Mac / Linux)
 wp-content/themes/silkaura/      # Storefront child theme (your code lives here)
   woocommerce/                   # WooCommerce template overrides
 wp-content/mu-plugins/           # Must-use plugins (local mail → Mailpit)
