@@ -40,7 +40,7 @@ wp() { "$PHP" -d memory_limit=512M "$WPCLI" --path="$DOCROOT" "${ROOT_FLAG[@]}" 
 
 step "Checking XAMPP at $XAMPP_DIR"
 [ -x "$PHP" ] || { echo "PHP not found at $PHP"; exit 1; }
-"$PHP" -r 'exit(version_compare(PHP_VERSION, "7.4", ">=") ? 0 : 1);' || { echo "PHP 7.4+ required (found $("$PHP" -r 'echo PHP_VERSION;'))"; exit 1; }
+"$PHP" -n -r 'exit(PHP_VERSION_ID >= 70400 ? 0 : 1);' || { echo "PHP 7.4+ is required, but $PHP is PHP $("$PHP" -n -r 'echo PHP_VERSION;'). Install a newer XAMPP (PHP 8.x)."; exit 1; }
 MYSQL_ARGS=(-h "$DB_HOST" -u "$DB_USER"); [ -n "$DB_PASSWORD" ] && MYSQL_ARGS+=(-p"$DB_PASSWORD")
 "$MYSQL" "${MYSQL_ARGS[@]}" -e 'SELECT 1' >/dev/null 2>&1 || { echo "Can't connect to MySQL. Start MySQL in the XAMPP control panel."; exit 1; }
 echo "PHP $("$PHP" -r 'echo PHP_VERSION;'), MySQL OK"

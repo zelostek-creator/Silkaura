@@ -78,12 +78,19 @@ function Link-Dir($target, $link) {
 Step "Checking XAMPP at $XamppDir"
 if (-not (Test-Path $Php))   { Fail "PHP not found at $Php. Pass -XamppDir if XAMPP is elsewhere." }
 if (-not (Test-Path $Mysql)) { Fail "MySQL client not found at $Mysql." }
-& $Php -r 'exit(version_compare(PHP_VERSION, "7.4", ">=") ? 0 : 1);'
-if ($LASTEXITCODE -ne 0) { Fail "PHP 7.4+ is required. Please update XAMPP." }
+# Compare the version here, not inside php -r: Windows PowerShell 5.1 strips double
+# quotes from arguments passed to programs, which breaks PHP code that contains them.
+# -n skips php.ini so startup warnings (e.g. a missing extension DLL) can't mix into the output.
+$phpVersion = (& $Php -n -r 'echo PHP_VERSION;' | Out-String).Trim()
+if (-not $phpVersion) {
+  Fail "$Php did not run. Open the XAMPP Control Panel, click Shell, and run 'php -v' to see the error."
+}
+if ([version]($phpVersion -replace '[^0-9.].*$', '') -lt [version]'7.4') {
+  Fail "PHP 7.4+ is required, but $Php is PHP $phpVersion. Install a newer XAMPP (PHP 8.x) from apachefriends.org."
+}
 $ma = MysqlArgs
 if ((Quiet-Exit { & $Mysql @ma -e "SELECT 1" }) -ne 0) { Fail "Can't connect to MySQL. Click Start next to MySQL in the XAMPP Control Panel." }
-$phpVersion = & $Php -r 'echo PHP_VERSION;'
-Write-Host "PHP $phpVersion, MySQL OK"
+Write-Host "PHP $phpVersion ($Php), MySQL OK"
 
 Step "Getting WP-CLI"
 New-Item -ItemType Directory -Force -Path $Tools | Out-Null
