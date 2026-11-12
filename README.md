@@ -32,6 +32,10 @@ database, installs WooCommerce and Storefront, and links the Silkaura theme from
 this repo, so edits to the theme files in the repo show up on the site right away.
 It's safe to run again.
 
+You can keep the repo anywhere (e.g. `Documents\Silkaura`) or put it straight in
+`htdocs\silkaura`. Both work; in the second case WordPress is installed around the
+repo files, and `.gitignore` keeps WordPress's own files out of git.
+
 Options (Windows: `-AdminPassword secret -Port 8080`; Mac/Linux: `ADMIN_PASSWORD=secret PORT=8080 bash ...`):
 `Site`, `DbName`, `DbUser`, `DbPassword`, `Port`, `AdminUser`, `AdminPassword`, `AdminEmail`, `XamppDir`.
 Set `Port` if Apache isn't on port 80 (common on Windows when Skype or IIS takes it).

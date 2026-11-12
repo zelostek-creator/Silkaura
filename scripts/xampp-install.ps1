@@ -61,7 +61,25 @@ function MysqlArgs {
   return $a
 }
 
+function Same-Path($a, $b) {
+  return [IO.Path]::GetFullPath($a).TrimEnd('\') -ieq [IO.Path]::GetFullPath($b).TrimEnd('\')
+}
+
 function Link-Dir($target, $link) {
+  if (Same-Path $target $link) {
+    # The repo is the site folder (cloned into htdocs), so the files are already in place.
+    if (-not (Test-Path $link)) {
+      # An earlier version of this script renamed the folder away; put it back.
+      $bak = Get-ChildItem -Path (Split-Path $link) -Directory -Filter "$(Split-Path $link -Leaf).bak.*" |
+        Sort-Object Name -Descending | Select-Object -First 1
+      if (-not $bak) { Fail "$link is missing from the repo. Download the repo again." }
+      Rename-Item $bak.FullName (Split-Path $link -Leaf)
+      Write-Host "Restored $link from $($bak.Name)"
+    } else {
+      Write-Host "$link already in place"
+    }
+    return
+  }
   if (Test-Path $link) {
     $item = Get-Item $link -Force
     if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {

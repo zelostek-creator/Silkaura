@@ -92,6 +92,18 @@ wp core is-installed 2>/dev/null || wp core install --url="$URL" --title="Silkau
 
 step "Linking Silkaura theme and mu-plugins from the repo"
 link() { # link <repo path> <wp path>
+  if [ "$(cd "$(dirname "$1")" && pwd -P)/$(basename "$1")" = "$(cd "$(dirname "$2")" && pwd -P)/$(basename "$2")" ]; then
+    # The repo is the site folder (cloned into htdocs), so the files are already in place.
+    if [ ! -e "$2" ]; then
+      # An earlier version of this script renamed the folder away; put it back.
+      bak="$(ls -d "$2".bak.* 2>/dev/null | sort | tail -1)"
+      [ -n "$bak" ] || { echo "$2 is missing from the repo. Download the repo again."; exit 1; }
+      mv "$bak" "$2" && echo "Restored $2 from $(basename "$bak")"
+    else
+      echo "$2 already in place"
+    fi
+    return
+  fi
   if [ -L "$2" ]; then rm "$2"; elif [ -e "$2" ]; then mv "$2" "$2.bak.$(date +%s)"; fi
   ln -s "$1" "$2" && echo "$2 -> $1"
 }

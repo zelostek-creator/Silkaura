@@ -7,3 +7,18 @@ vendor/
 /wp-content/upgrade/
 /wp-content/cache/
 /.tools/
+
+# WordPress core, for when the repo is cloned straight into XAMPP's htdocs
+/wp-admin/
+/wp-includes/
+/index.php
+/wp-*.php
+/xmlrpc.php
+/license.txt
+/readme.html
+/.htaccess
+/wp-content/*
+!/wp-content/themes/
+!/wp-content/mu-plugins/
+/wp-content/themes/*
+!/wp-content/themes/silkaura/
