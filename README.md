@@ -8,17 +8,52 @@ Local development stack for the Silkaura store, built on Docker.
 | Mailpit    | http://localhost:8025        | Catches all outgoing store emails      |
 | phpMyAdmin | http://localhost:8081        | Optional: `make pma`                   |
 
-## Requirements
-- Docker with Docker Compose v2
-- `make` (or run the commands in the `Makefile` by hand)
+![Shop page](docs/shop.png)
 
-## Quick start
+## Run it on your computer
+
+### 1. Install Docker
+- **Mac / Windows:** install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and open it once
+  so it's running (whale icon in the menu bar / system tray).
+  On Windows, accept the WSL 2 prompt if Docker Desktop asks for it.
+- **Linux:** install Docker Engine and the Compose plugin from your distro or docs.docker.com.
+
+Check it works: `docker compose version`
+
+### 2. Get the code
 ```bash
-cp .env.example .env      # set admin password etc.
+git clone https://github.com/zelostek-creator/Silkaura.git
+cd Silkaura
+git checkout claude/serene-sagan-7q8qxp   # until this is merged into main
+```
+
+### 3. Install the store
+**Mac / Linux** (has `make`):
+```bash
+cp .env.example .env      # then edit .env: set WP_ADMIN_PASSWORD
 make install
 ```
+
+**Windows** (PowerShell, no `make` needed):
+```powershell
+copy .env.example .env    # then edit .env: set WP_ADMIN_PASSWORD
+docker compose up -d
+docker compose run --rm --entrypoint sh wpcli /scripts/install.sh
+```
+
+First run downloads ~1 GB of images and takes a few minutes. When it prints
+`Silkaura store ready`, open http://localhost:8080 and log in at
+http://localhost:8080/wp-admin with the user/password from `.env`.
+
+> Port 8080 already in use? Change `WP_PORT` and `WP_URL` in `.env` before installing.
+
+### Stopping and starting
+Your data is kept in Docker volumes between runs.
+- Stop: `make down` (Windows: `docker compose down`)
+- Start again: `make up` (Windows: `docker compose up -d`)
+- Wipe everything and start fresh: `make reset` (Windows: `docker compose down -v`)
 `make install` is idempotent. It:
-1. Starts MariaDB, WordPress (PHP 8.3) and Mailpit
+1. Starts MariaDB, WordPress 7 (PHP 8.3) and Mailpit
 2. Installs WordPress core
 3. Installs and activates **WooCommerce** and the **Storefront** parent theme
 4. Activates the **Silkaura** child theme
@@ -36,6 +71,12 @@ make wp ARGS="plugin list"      # any WP-CLI command
 make wp ARGS="wc product list --user=admin"
 make reset                      # stop and DELETE all data
 ```
+Without `make`, the equivalent of `make wp ARGS="plugin list"` is
+`docker compose run --rm wpcli plugin list`.
+
+## Testing orders
+Cash on Delivery is enabled, so you can place an order at checkout without a card.
+Order emails (customer + admin) show up in Mailpit at http://localhost:8025.
 
 ## What's in the repo
 ```

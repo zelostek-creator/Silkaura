@@ -19,20 +19,21 @@ wp plugin activate woocommerce
 wp theme is-installed storefront || wp theme install storefront
 wp theme activate silkaura
 
-wp rewrite structure '/%postname%/' --hard
-wp option update blogdescription "Luxury silk, delivered"
-wp option update woocommerce_default_country "$WC_COUNTRY"
-wp option update woocommerce_currency "$WC_CURRENCY"
-wp option update woocommerce_onboarding_profile '{"skipped":true}' --format=json
-wp option update woocommerce_task_list_hidden yes
-wp option update woocommerce_coming_soon no
+wp rewrite structure '/%postname%/'
+wp rewrite flush
+wp option update blogdescription "Luxury silk, delivered" || true
+wp option update woocommerce_default_country "$WC_COUNTRY" || true
+wp option update woocommerce_currency "$WC_CURRENCY" || true
+wp option update woocommerce_onboarding_profile '{"skipped":true}' --format=json || true
+wp option update woocommerce_task_list_hidden yes || true
+wp option update woocommerce_coming_soon no || true
 
 # Create shop/cart/checkout/my-account pages
 wp wc tool run install_pages --user="$WP_ADMIN_USER" >/dev/null 2>&1 || true
 
 # Enable offline payment methods for local testing
-wp option update woocommerce_cod_settings '{"enabled":"yes","title":"Cash on delivery"}' --format=json
-wp option update woocommerce_bacs_settings '{"enabled":"yes","title":"Direct bank transfer"}' --format=json
+wp option update woocommerce_cod_settings '{"enabled":"yes","title":"Cash on delivery"}' --format=json || true
+wp option update woocommerce_bacs_settings '{"enabled":"yes","title":"Direct bank transfer"}' --format=json || true
 
 # Sample products (only once)
 if [ "$(wp wc product list --user="$WP_ADMIN_USER" --format=count)" = "0" ]; then
