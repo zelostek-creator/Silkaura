@@ -1,0 +1,42 @@
+/*
+Theme Name:   Silkaura
+Theme URI:    https://github.com/zelostek-creator/Silkaura
+Description:  Silkaura WooCommerce theme (Storefront child theme).
+Author:       Silkaura
+Template:     storefront
+Version:      0.1.0
+Requires PHP: 8.1
+Text Domain:  silkaura
+*/
+
+:root {
+  --silk-ink: #2b2420;
+  --silk-cream: #faf6f1;
+  --silk-gold: #b08d57;
+  --silk-gold-dark: #8c6d3f;
+}
+
+body { background: var(--silk-cream); color: var(--silk-ink); }
+
+.site-header { background: #fff; border-bottom: 1px solid #ece4da; }
+.site-title a, .main-navigation a { color: var(--silk-ink); }
+
+h1, h2, h3, .site-title, .product_title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  letter-spacing: .02em;
+}
+
+button, .button, input[type="submit"],
+.woocommerce a.button.alt, .woocommerce button.button.alt {
+  background: var(--silk-gold);
+  border-color: var(--silk-gold);
+  color: #fff;
+}
+button:hover, .button:hover, .woocommerce a.button.alt:hover {
+  background: var(--silk-gold-dark);
+  border-color: var(--silk-gold-dark);
+  color: #fff;
+}
+
+.price, .woocommerce-Price-amount { color: var(--silk-gold-dark); }
+.onsale { background: var(--silk-ink); color: #fff; border: 0; }
