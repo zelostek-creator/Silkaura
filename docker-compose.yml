@@ -35,6 +35,15 @@ services:
         define('WP_DEBUG_DISPLAY', false);
         define('SMTP_HOST', 'mailpit');
         define('SMTP_PORT', 1025);
+        // Local dev: serve the site at whatever address it's opened from (localhost,
+        // a LAN IP, or a preview proxy) instead of redirecting to WP_URL.
+        if (!empty($$_SERVER['HTTP_HOST'])) {
+          $$h = !empty($$_SERVER['HTTP_X_FORWARDED_HOST']) ? explode(',', $$_SERVER['HTTP_X_FORWARDED_HOST'])[0] : $$_SERVER['HTTP_HOST'];
+          $$https = (($$_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') || (!empty($$_SERVER['HTTPS']) && $$_SERVER['HTTPS'] !== 'off');
+          if ($$https) { $$_SERVER['HTTPS'] = 'on'; }
+          define('WP_HOME', ($$https ? 'https://' : 'http://') . trim($$h));
+          define('WP_SITEURL', WP_HOME);
+        }
     volumes:
       - wp_core:/var/www/html
       - ./wp-content/themes/silkaura:/var/www/html/wp-content/themes/silkaura
