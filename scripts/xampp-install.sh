@@ -36,7 +36,7 @@ WPCLI="$TOOLS/wp-cli.phar"
 
 step() { printf '\n==> %s\n' "$*"; }
 ROOT_FLAG=(); [ "$(id -u)" = "0" ] && ROOT_FLAG=(--allow-root)  # XAMPP on Linux is often run with sudo
-wp() { "$PHP" -d memory_limit=512M "$WPCLI" --path="$DOCROOT" "${ROOT_FLAG[@]}" "$@"; }
+wp() { "$PHP" -d memory_limit=512M -d error_reporting=8191 "$WPCLI" --path="$DOCROOT" "${ROOT_FLAG[@]}" "$@"; }
 
 step "Checking XAMPP at $XAMPP_DIR"
 [ -x "$PHP" ] || { echo "PHP not found at $PHP"; exit 1; }

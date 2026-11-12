@@ -44,7 +44,8 @@ function Step($msg) { Write-Host ""; Write-Host "==> $msg" -ForegroundColor Cyan
 function Fail($msg) { Write-Host "ERROR: $msg" -ForegroundColor Red; exit 1 }
 
 function Wp {
-  & $Php -d memory_limit=512M $WpCli "--path=$DocRoot" @args
+  # error_reporting 8191 = E_ALL without deprecation notices (noisy on PHP 8.5+)
+  & $Php -d memory_limit=512M -d error_reporting=8191 $WpCli "--path=$DocRoot" @args
   if ($LASTEXITCODE -ne 0) { Fail "wp $($args -join ' ') failed (exit $LASTEXITCODE)" }
 }
 
@@ -160,7 +161,7 @@ RewriteRule . /$Site/index.php [L]
 [IO.File]::WriteAllText((Join-Path $DocRoot ".htaccess"), $htaccess.Replace("`r`n", "`n"), (New-Object Text.UTF8Encoding $false))
 
 Step "Installing WordPress"
-if ((Quiet-Exit { & $Php $WpCli "--path=$DocRoot" core is-installed }) -ne 0) {
+if ((Quiet-Exit { & $Php -d error_reporting=8191 $WpCli "--path=$DocRoot" core is-installed }) -ne 0) {
   Wp core install "--url=$Url" "--title=Silkaura" "--admin_user=$AdminUser" "--admin_password=$AdminPassword" "--admin_email=$AdminEmail" --skip-email
 }
 
